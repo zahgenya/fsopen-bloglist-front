@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
 import Notification from './components/notification';
-import blogService from './services/blogs';
+import blogService from './services/blogService';
 import loginService from './services/login';
+import BlogForm from './components/BlogForm';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
+  const [newBlog, setNewBlog] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -40,6 +42,9 @@ const App = () => {
       setPassword('');
     } catch (exception) {
       setErrorMessage('Wrong credentials');
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
     }
   };
 
@@ -67,19 +72,30 @@ const App = () => {
     </form>
   );
 
+  const logout = () => {
+    localStorage.clear();
+    console.log('token cleared!')
+  }
+
   return (
     <div>
-      {!user && loginForm()}
+      <Notification message={errorMessage} />
+      {!user && (
+        <div>
+          <h1>log in to application</h1>
+          {loginForm()}
+        </div>
+        )}
       {user && (
         <div>
-          <p>{user.name} logged in</p>
-          {noteForm()}
+          <h1>blogs</h1>
+          <p>{user.name} logged in<button onClickCapture={logout}>logout</button></p>
+          <BlogForm />
+          {blogs.map((blog) => (
+            <Blog key={blog.id} blog={blog} />
+          ))}
         </div>
       )}
-      <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
     </div>
   );
 };
