@@ -4,6 +4,7 @@ import Notification from './components/notification';
 import blogService from './services/blogService';
 import loginService from './services/login';
 import BlogForm from './components/BlogForm';
+import ErrorNotification from './components/ErrorNotification';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -11,6 +12,7 @@ const App = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
+  const [succesMessage, setSuccesMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
@@ -74,23 +76,31 @@ const App = () => {
 
   const logout = () => {
     localStorage.clear();
-    console.log('token cleared!')
-  }
+    console.log('token cleared!');
+  };
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <ErrorNotification message={errorMessage} />
+      <Notification message={succesMessage} />
       {!user && (
         <div>
           <h1>log in to application</h1>
           {loginForm()}
         </div>
-        )}
+      )}
       {user && (
         <div>
           <h1>blogs</h1>
-          <p>{user.name} logged in<button onClickCapture={logout}>logout</button></p>
-          <BlogForm />
+          <p>
+            {user.name} logged in<button onClickCapture={logout}>logout</button>
+          </p>
+          <BlogForm
+            blogs={blogs}
+            setBlogs={setBlogs}
+            setErrorMessage={setErrorMessage}
+            setSuccesMessage={setSuccesMessage}
+          />
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
