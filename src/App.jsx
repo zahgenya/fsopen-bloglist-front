@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import Notification from './components/notification';
 import blogService from './services/blogService';
@@ -6,10 +6,10 @@ import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import ErrorNotification from './components/ErrorNotification';
 import LoginForm from './components/LoginForm';
+import Togglable from './components/Togglable';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [newBlog, setNewBlog] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
@@ -29,6 +29,15 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  const blogFormRef = useRef();
+
+  const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+    blogService.create(blogObject).then((returnedBlog) => {
+      setBlogs(blogs.concat(returnedBlog));
+    });
+  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -80,6 +89,12 @@ const App = () => {
     console.log('token cleared!');
   };
 
+  const blogForm = () => (
+    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+      <BlogForm createBlog={addBlog} /> {/* Pass createBlog as a prop */}
+    </Togglable>
+  );
+
   return (
     <div>
       <ErrorNotification message={errorMessage} />
@@ -88,21 +103,18 @@ const App = () => {
       {!user && loginForm()}
       {user && (
         <div>
-          <h1>blogs</h1>
           <p>
             {user.name} logged in<button onClickCapture={logout}>logout</button>
           </p>
-          <BlogForm
-            blogs={blogs}
-            setBlogs={setBlogs}
-            setErrorMessage={setErrorMessage}
-            setSuccesMessage={setSuccesMessage}
-          />
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
+          {blogForm()}
         </div>
       )}
+
+      <div>
+        {blogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} />
+        ))}
+      </div>
     </div>
   );
 };

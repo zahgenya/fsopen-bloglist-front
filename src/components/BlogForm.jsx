@@ -1,66 +1,66 @@
 import { useState } from 'react';
-import blogService from '../services/blogService';
 
-const BlogForm = ({ blogs, setBlogs, setErrorMessage, setSuccesMessage }) => {
-  const [newTitle, setNewTitle] = useState('');
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newUrl, setNewUrl] = useState('');
-
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value);
-  };
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value);
-  };
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value);
-  };
+const BlogForm = ({ createBlog }) => {
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    author: '',
+    url: '',
+  });
 
   const addBlog = (event) => {
     event.preventDefault();
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-    };
+    createBlog({
+      title: newBlog.title,
+      author: newBlog.author,
+      url: newBlog.url,
+      likes: 0,
+    });
 
-    blogService
-      .create(blogObject)
-      .then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog));
-        setNewTitle('');
-        setNewAuthor('');
-        setNewUrl('');
-        setSuccesMessage(`a new blog ${newTitle} added`);
-        setTimeout(() => {
-          setSuccesMessage(null);
-        }, 5000);
-      })
-      .catch((error) => {
-        setErrorMessage(`Error: ${error.response.data.error}`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      });
+    setNewBlog({
+      title: '',
+      author: '',
+      url: '',
+    });
   };
 
   return (
-    <form onSubmit={addBlog}>
-      <div>
-        title: <input value={newTitle} onChange={handleTitleChange} />
-      </div>
-      <div>
-        author: <input value={newAuthor} onChange={handleAuthorChange} />
-      </div>
-      <div>
-        url: <input value={newUrl} onChange={handleUrlChange} />
-      </div>
-      <div>
-        <button type="submit">create</button>
-      </div>
-    </form>
+    <div>
+      <h2>Create a new blog</h2>
+
+      <form onSubmit={addBlog}>
+        <div>
+          Title:
+          <input
+            type="text"
+            value={newBlog.title}
+            onChange={(event) =>
+              setNewBlog({ ...newBlog, title: event.target.value })
+            }
+          />
+        </div>
+        <div>
+          Author:
+          <input
+            type="text"
+            value={newBlog.author}
+            onChange={(event) =>
+              setNewBlog({ ...newBlog, author: event.target.value })
+            }
+          />
+        </div>
+        <div>
+          URL:
+          <input
+            type="text"
+            value={newBlog.url}
+            onChange={(event) =>
+              setNewBlog({ ...newBlog, url: event.target.value })
+            }
+          />
+        </div>
+        <button type="submit">save</button>
+      </form>
+    </div>
   );
 };
 
