@@ -16,6 +16,8 @@ const App = () => {
   const [succesMessage, setSuccesMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [loginVisible, setLoginVisible] = useState(false);
+  const [sortedBlogs, setSortedBlogs] = useState([]);
+  const [sortOrder, setSortOrder] = useState('descending');
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -95,6 +97,42 @@ const App = () => {
     </Togglable>
   );
 
+  const addLike = (id) => {
+    const blog = blogs.find((b) => b.id === id);
+    const changedBlog = { ...blog, likes: blog.likes + 1 };
+
+    blogService
+      .update(id, changedBlog)
+      .then((returnedBlog) => {
+        setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorMessage(
+          `blog '${blog.title}' was already removed from the server`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  };
+
+  const sortBlogs = () => {
+    const sorted = [...blogs];
+    sorted.sort((a, b) => {
+      if (sortOrder === 'descending') {
+        return b.likes - a.likes;
+      } else {
+        return a.likes - b.likes;
+      }
+    });
+    setSortedBlogs(sorted);
+  };
+
+  useEffect(() => {
+    sortBlogs();
+  }, [blogs, sortOrder]);
+
   return (
     <div>
       <ErrorNotification message={errorMessage} />
@@ -111,8 +149,8 @@ const App = () => {
       )}
 
       <div>
-        {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+        {sortedBlogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} addLike={addLike} />
         ))}
       </div>
     </div>
