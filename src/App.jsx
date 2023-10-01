@@ -133,6 +133,26 @@ const App = () => {
     sortBlogs();
   }, [blogs, sortOrder]);
 
+  const removeBlog = (id) => {
+    const confirmed = window.confirm('Do you want to remove this blog?');
+    if (!confirmed) return;
+
+    blogService.deleteBlog(id)
+      .then(() => {
+        setBlogs(blogs.filter(blog => blog.id !== id));
+        setSuccesMessage('Blog removed successfully');
+        setTimeout(() => {
+          setSuccesMessage(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        setErrorMessage('Failed to remove blog');
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  };
+
   return (
     <div>
       <ErrorNotification message={errorMessage} />
@@ -150,7 +170,7 @@ const App = () => {
 
       <div>
         {sortedBlogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} addLike={addLike} />
+          <Blog key={blog.id} blog={blog} addLike={addLike} removeBlog={removeBlog} />
         ))}
       </div>
     </div>
