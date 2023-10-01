@@ -93,7 +93,7 @@ const App = () => {
 
   const blogForm = () => (
     <Togglable buttonLabel="new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} /> {/* Pass createBlog as a prop */}
+      <BlogForm createBlog={addBlog} />
     </Togglable>
   );
 
