@@ -35,7 +35,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
           <button onClick={() => addLike(blog.id)}>like</button>
         </p>
         <p style={paragraphStyle}>{blog.author}</p>
-        <button onClick={() => removeBlog(blog.id)}>remove</button>
+        <button id='remove-button' onClick={() => removeBlog(blog.id)}>remove</button>
       </div>
     </div>
   );
