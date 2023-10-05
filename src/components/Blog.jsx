@@ -1,6 +1,6 @@
 import { useState, useImperativeHandle } from 'react';
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog, addLike, removeBlog, user }) => {
   const [visible, setVisible] = useState('');
 
   const blogStyle = {
@@ -29,13 +29,15 @@ const Blog = ({ blog, addLike, removeBlog }) => {
         <button>{visible ? 'Hide' : 'View'}</button>
       </div>
       <div style={showWhenVisible}>
+        {user && user.username === blog.user.username && (
+          <button id='remove-button' onClick={() => removeBlog(blog.id)}>remove</button>
+        )}
         <p style={paragraphStyle}>{blog.url}</p>
         <p style={paragraphStyle}>
           likes: {blog.likes}
-          <button onClick={() => addLike(blog.id)}>like</button>
+          <button id='likeButton' onClick={() => addLike(blog.id)}>like</button>
         </p>
         <p style={paragraphStyle}>{blog.author}</p>
-        <button id='remove-button' onClick={() => removeBlog(blog.id)}>remove</button>
       </div>
     </div>
   );
